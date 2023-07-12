@@ -3,3 +3,4 @@
 ### Maintainability:
 [![Maintainability](https://api.codeclimate.com/v1/badges/16fdde6529068b5cfa8b/maintainability)](https://codeclimate.com/github/dapauls/frontend-project-11/maintainability)
 ### Linter:
+[![Linter](https://github.com/dapauls/frontend-project-11/actions/workflows/linter.yml/badge.svg)](https://github.com/dapauls/frontend-project-11/actions/workflows/linter.yml)
