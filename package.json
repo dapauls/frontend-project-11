@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/dapauls/frontend-project-11/issues"
   },
-  "homepage": "https://github.com/dapauls/frontend-project-11#readme"
+  "homepage": "https://github.com/dapauls/frontend-project-11#readme",
+  "devDependencies": {
+    "eslint": "^8.44.0"
+  }
 }
