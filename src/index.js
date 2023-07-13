@@ -1,6 +1,5 @@
 import './styles.scss';
 import 'bootstrap';
+import app from './app.js';
 
-const mult = (a, b) => a + b;
-
-console.log(mult(2, 3));
+app();
