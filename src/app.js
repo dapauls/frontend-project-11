@@ -1,8 +1,10 @@
 import * as yup from 'yup';
-/* import onChange from 'on-change'; // зачем */
+import onChange from 'on-change';
 
-const state = {
+const initialState = {
   form: {
+    value: '',
+    sameValue: '',
     valid: true,
     inputList: [],
     errors: {
@@ -18,33 +20,39 @@ const elements = {
   input: document.querySelector('input'),
 };
 
-const isValid = (inputData) => {
+const isValid = (val) => {
   const shema = yup.string().required().url();
-  shema.validate(inputData, { abortEarly: false })
+  shema.validate(val, { abortEarly: false })
     .catch(() => {
-      elements.textError.textContent = state.form.errors.rssIsNotValid;
+      elements.textError.textContent = initialState.form.errors.rssIsNotValid;
     });
 };
 
-/* const watchedState = onChange(state, () => {
-
-}); */
+const watchedState = onChange(initialState, (_path, value, _previousValue) => {
+  elements.textError.textContent = '';
+  isValid(value);
+  if (initialState.form.inputList.includes(value)) {
+    elements.textError.textContent = initialState.form.errors.rssExist;
+  }
+  initialState.form.inputList.push(value);
+  elements.input.value = '';
+});
 
 export default () => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    elements.textError.textContent = '';
     const formData = new FormData(e.target);
     const val = formData.get('url').trim();
-    state.form.value = val;
-    isValid(val);
-    if (state.form.inputList.includes(val)) {
-      elements.textError.textContent = state.form.errors.rssExist;
+    if (watchedState.form.value === val) {
+      watchedState.form.sameValue = val;
+    } else {
+      watchedState.form.value = val;
     }
-    state.form.inputList.push(val);
-    // e.target.reset();
-    // поле очищается, но на любой запрос срабатывает 'Ссылка должна быть валидным URL'
   });
 };
-// 1 - поле не очищается
 
+// 1 - рамка не подсвечивается красным
+// 2 - текст подсказки снизу сливается с фоном. через атрибут стайл и сиэсэс не исправляется
+// (а ошибки красные автоматически - как так??)
+// 3 - правильно ли я сделала, что изВалид перенесла отдельно? не сказывается ли это на работе?
+// после выдачи ошибки код как бы перестает работать?
