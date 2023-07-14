@@ -1,5 +1,15 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
+import i18n from 'i18next';
+// import { setLocale } from 'yup';
+import resources from './locales/index.js';
+
+const i18nInstance = i18n.createInstance();
+i18nInstance.init({
+  lng: 'ru',
+  debug: true,
+  resources,
+}).then();
 
 const initialState = {
   form: {
@@ -7,10 +17,7 @@ const initialState = {
     sameValue: '',
     valid: true,
     inputList: [],
-    errors: {
-      rssExist: 'RSS уже существует',
-      rssIsNotValid: 'Ссылка должна быть валидным URL',
-    },
+    // error: null,
   },
 };
 
@@ -20,22 +27,17 @@ const elements = {
   input: document.querySelector('input'),
 };
 
-const isValid = (val) => {
-  const shema = yup.string().required().url();
-  shema.validate(val, { abortEarly: false })
-    .catch(() => {
-      elements.textError.textContent = initialState.form.errors.rssIsNotValid;
-    });
-};
-
-const watchedState = onChange(initialState, (_path, value, _previousValue) => {
+const watchedState = onChange(initialState, (_path, value) => {
   elements.textError.textContent = '';
-  isValid(value);
-  if (initialState.form.inputList.includes(value)) {
-    elements.textError.textContent = initialState.form.errors.rssExist;
-  }
-  initialState.form.inputList.push(value);
-  elements.input.value = '';
+  const shema = yup.string().required().url().notOneOf(initialState.form.inputList);
+  shema.validate(value, { abortEarly: false })
+    .then(() => {
+      initialState.form.inputList.push(value);
+      elements.input.value = '';
+    })
+    .catch((error) => {
+      elements.textError.textContent = i18nInstance.t(error);
+    });
 });
 
 export default () => {
@@ -51,8 +53,11 @@ export default () => {
   });
 };
 
+// Во втором шаге не доделано:
 // 1 - рамка не подсвечивается красным
 // 2 - текст подсказки снизу сливается с фоном. через атрибут стайл и сиэсэс не исправляется
 // (а ошибки красные автоматически - как так??)
-// 3 - правильно ли я сделала, что изВалид перенесла отдельно? не сказывается ли это на работе?
-// после выдачи ошибки код как бы перестает работать?
+// Третий шаг:
+// ДОП - линтер помечает расширения файлов в импорте, как ошибку,
+// но без расширения ничего не работает
+// ДОП - по факту вроде сделала как правильно, а всё сломалось
